@@ -144,15 +144,19 @@ def csrf_protection():
 
 
 def run_negative_register_tests():
+
     missing_phone_or_email()
     invalid_phone_format()
     invalid_email_format()
     empty_phone_or_email()
+
     invalid_cookie()
     invalid_http_method()
+
     large_payload()
     malformed_json()
     server_not_reachable()
+
     server_error()
     xss_injection()
     sql_injection()
