@@ -2,7 +2,6 @@ import requests
 import json
 
 url = "https://api-staging.tabdealbot.com/register/"
-
 headers = {
     'Content-Type': 'application/json',
     'Cookie': 'TS01933b4f=0150a3e24eac000bc73af795c7336396cfbb53b1f6b3babfdd24f7faf54586669bf23f6d30133e9104f4c2a4d748564846f7f2dadc'
@@ -10,7 +9,7 @@ headers = {
 
 def invalid_phone_number():
     payload = json.dumps({
-        "phone": "09104",  # Short phone number (less than 10 digits)
+        "phone": "09104",
         "token": "66314",
         "password": "Keshavarz007007"
     })
@@ -21,7 +20,7 @@ def weak_password():
     payload = json.dumps({
         "phone": "09104491104",
         "token": "66314",
-        "password": "123"  # Weak password
+        "password": "123"
     })
     response = requests.put(url, headers=headers, data=payload)
     print("Test case 2 (Weak password):", response.status_code, response.text)
@@ -29,7 +28,7 @@ def weak_password():
 def invalid_token():
     payload = json.dumps({
         "phone": "09104491104",
-        "token": "invalid_token",  # Invalid token
+        "token": "invalid_token",
         "password": "Keshavarz007007"
     })
     response = requests.put(url, headers=headers, data=payload)
@@ -37,16 +36,16 @@ def invalid_token():
 
 def empty_fields():
     payload = json.dumps({
-        "phone": "",  # Empty phone field
-        "token": "",  # Empty token field
-        "password": ""  # Empty password field
+        "phone": "",
+        "token": "",
+        "password": ""
     })
     response = requests.put(url, headers=headers, data=payload)
     print("Test case 4 (Empty fields):", response.status_code, response.text)
 
 def existing_phone_number():
     payload = json.dumps({
-        "phone": "09104491104",  # Existing phone number (already registered)
+        "phone": "09104491104",
         "token": "66314",
         "password": "Keshavarz007007"
     })
@@ -56,7 +55,7 @@ def existing_phone_number():
 def invalid_token_format():
     payload = json.dumps({
         "phone": "09104491104",
-        "token": "66314invalid",  # Invalid token format
+        "token": "66314invalid",
         "password": "Keshavarz007007"
     })
     response = requests.put(url, headers=headers, data=payload)
@@ -65,7 +64,7 @@ def invalid_token_format():
 def invalid_cookie():
     headers_invalid_cookie = {
         'Content-Type': 'application/json',
-        'Cookie': 'invalid_cookie_value'  # Invalid cookie
+        'Cookie': 'invalid_cookie_value'
     }
     payload = json.dumps({
         "phone": "09104491104",
@@ -77,7 +76,7 @@ def invalid_cookie():
 
 def invalid_content_type():
     headers_invalid_content_type = {
-        'Content-Type': 'text/plain',  # Invalid content type
+        'Content-Type': 'text/plain',
         'Cookie': 'TS01933b4f=0150a3e24eac000bc73af795c7336396cfbb53b1f6b3babfdd24f7faf54586669bf23f6d30133e9104f4c2a4d748564846f7f2dadc'
     }
     payload = json.dumps({
