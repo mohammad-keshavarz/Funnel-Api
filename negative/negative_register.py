@@ -143,7 +143,7 @@ def csrf_protection():
         print(f"Test case 13 (Error caught as expected for CSRF attack): {response.status_code} - {response.text}")
 
 
-def run_negative_tests():
+def run_negative_register_tests():
     missing_phone_or_email()
     invalid_phone_format()
     invalid_email_format()
@@ -157,4 +157,4 @@ def run_negative_tests():
     xss_injection()
     sql_injection()
 
-run_negative_tests()
+run_negative_register_tests()
