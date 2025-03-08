@@ -3,7 +3,6 @@ import json
 import random
 
 generated_numbers = set()
-
 def generate_unique_phone_number():
     while True:
         operator_code = random.randint(10, 99)
@@ -13,13 +12,21 @@ def generate_unique_phone_number():
             generated_numbers.add(phone_number)
             return phone_number
 
-def generate_national_Code_id():
-    first_nine_digits = [random.randint(0, 9) for _ in range(9)]
-    checksum = sum((10 - i) * first_nine_digits[i] for i in range(9)) % 11
-    control_digit = checksum if checksum < 2 else 11 - checksum
-    national_id = "".join(map(str, first_nine_digits)) + str(control_digit)
-    return national_id
 
+generated_codes = set()
+def generate_national_Code_id():
+    while True:
+        first_nine_digits = [random.randint(0, 9) for _ in range(9)]
+        checksum = sum((10 - i) * first_nine_digits[i] for i in range(9)) % 11
+        control_digit = checksum if checksum < 2 else 11 - checksum
+        national_id = "".join(map(str, first_nine_digits)) + str(control_digit)
+
+        if national_id not in generated_codes:
+            generated_codes.add(national_id)
+            return national_id
+
+
+generated_cards = set()
 def luhn_checksum(card_number):
     digits = [int(d) for d in card_number]
     for i in range(0, 15, 2):
@@ -29,12 +36,17 @@ def luhn_checksum(card_number):
     return (10 - sum(digits) % 10) % 10
 
 def generate_bank_card():
-    bank_prefix = random.choice(["6037", "5892", "6274", "6221", "5022", "6219", "6393", "5859"])
-    random_digits = [random.randint(0, 9) for _ in range(11)]
-    partial_card_number = bank_prefix + "".join(map(str, random_digits))
-    control_digit = luhn_checksum(partial_card_number + "0")
-    full_card_number = partial_card_number + str(control_digit)
-    return full_card_number
+    while True:
+        bank_prefix = random.choice(["6037", "5892", "6274", "6221", "5022", "6219", "6393", "5859"])
+        random_digits = [random.randint(0, 9) for _ in range(11)]
+        partial_card_number = bank_prefix + "".join(map(str, random_digits))
+        control_digit = luhn_checksum(partial_card_number + "0")
+        full_card_number = partial_card_number + str(control_digit)
+
+        if full_card_number not in generated_cards:
+            generated_cards.add(full_card_number)
+            return full_card_number
+
 
 def register_user(phone_number_or_email: str):
     url = "https://api-staging.tabdealbot.com/register/"
@@ -44,6 +56,7 @@ def register_user(phone_number_or_email: str):
     response_json = response.json()
     print(response_json["message"])
     # print(response.text)
+
 
 def register_user_get_otp(phone_number_or_email):
     url = "https://api-staging.tabdealbot.com/register/"
