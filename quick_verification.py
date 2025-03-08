@@ -3,6 +3,7 @@ import json
 import random
 
 generated_numbers = set()
+
 def generate_unique_phone_number():
     while True:
         operator_code = random.randint(10, 99)
@@ -12,14 +13,12 @@ def generate_unique_phone_number():
             generated_numbers.add(phone_number)
             return phone_number
 
-
 def generate_national_Code_id():
     first_nine_digits = [random.randint(0, 9) for _ in range(9)]
     checksum = sum((10 - i) * first_nine_digits[i] for i in range(9)) % 11
     control_digit = checksum if checksum < 2 else 11 - checksum
     national_id = "".join(map(str, first_nine_digits)) + str(control_digit)
     return national_id
-
 
 def luhn_checksum(card_number):
     digits = [int(d) for d in card_number]
@@ -29,7 +28,6 @@ def luhn_checksum(card_number):
             digits[i] -= 9
     return (10 - sum(digits) % 10) % 10
 
-
 def generate_bank_card():
     bank_prefix = random.choice(["6037", "5892", "6274", "6221", "5022", "6219", "6393", "5859"])
     random_digits = [random.randint(0, 9) for _ in range(11)]
@@ -37,11 +35,6 @@ def generate_bank_card():
     control_digit = luhn_checksum(partial_card_number + "0")
     full_card_number = partial_card_number + str(control_digit)
     return full_card_number
-
-
-
-
-
 
 def register_user(phone_number_or_email: str):
     url = "https://api-staging.tabdealbot.com/register/"
@@ -52,13 +45,12 @@ def register_user(phone_number_or_email: str):
     print(response_json["message"])
     # print(response.text)
 
-
 def register_user_get_otp(phone_number_or_email):
     url = "https://api-staging.tabdealbot.com/register/"
     payload = json.dumps({
         "phone": phone_number_or_email,
         "token": input('Enter OTP: '),
-        "password": 'harchi'
+        "password": 'A@123456789'
     })
     headers = {'Content-Type': 'application/json'}
     response = requests.put(url, headers=headers, data=payload)
@@ -69,7 +61,6 @@ def register_user_get_otp(phone_number_or_email):
     else:
         print("Error:", response.text)
         return None
-
 
 def verify_credentials(national_code, birth_date, card_number, token):
     url = "https://api-staging.tabdealbot.com/verification/credentials/"
