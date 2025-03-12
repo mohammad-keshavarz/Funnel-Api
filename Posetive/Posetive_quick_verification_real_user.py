@@ -1,3 +1,5 @@
+import time
+
 import requests
 import json
 import random
@@ -50,7 +52,7 @@ import random
 #
 def register_user(phone_number_or_email: str):
     url = "https://api-staging.tabdealbot.com/register/"
-    payload = json.dumps({"phone_or_email": ""})
+    payload = json.dumps({"phone_or_email": phone_number_or_email})
     headers = {'Content-Type': 'application/json'}
     response = requests.post(url, headers=headers, data=payload)
     response_json = response.json()
@@ -58,12 +60,20 @@ def register_user(phone_number_or_email: str):
     # print(response.text)
 
 
+
+
+
+
+
+
+
+
 def register_user_get_otp(phone_number_or_email):
     get_input_from_user = input('Enter OTP: ')
 
     url = "https://api-staging.tabdealbot.com/register/"
     payload = json.dumps({
-        "phone": phone_number_or_email,
+        "phone": phone_number_or_email, # شماره تلفن وحید زاهدی
         "token": get_input_from_user,
         "password": 'A@123456789'
     })
@@ -96,43 +106,55 @@ def verify_credentials(national_code, birth_date, card_number, token):
     print(response.text)
 
 
-def get_trader_info():
-    print("#############################  Trader #######################################")
-    url = "https://api-web.tabdeal.org/r/trader/"
-    headers = {
-        "accept": "application/json, text/plain, */*",
-        "accept-language": "fa-ir",
-        "authorization":  f'HHRAA {token}',
-        "origin": "https://api-web.tabdeal.org",
-        "priority": "u=1, i",
-        "referer": "https://api-web.tabdeal.org",
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
-        "traceparent": "00-11c37ab9558c7c3a39c0ea29d53a58ae-5ed06f0c9aaf2dc5-00",
-        "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1"
-    }
+def get_trader_info(token):
+    attempt_counter = 1  # شمارش تعداد تلاش‌ها
 
-    response = requests.get(url, headers=headers)
-    print(response.text)
+    for _ in range(4):  # اجرا شدن 4 بار متوالی
+        print("#############################  Trader #######################################")
+        print("\n")
+        # اضافه کردن کامنت برای تلاش‌ها
+        print(f"تلاش برای دیدن وضعیت فیلدهای مورد نظر در بار {attempt_counter}")
+        print("\n")
+        attempt_counter += 1  # افزایش شمارنده تلاش
 
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Request failed with status code {response.status_code}"}
+        url = "https://api-staging.tabdealbot.com/trader/"
 
+        headers = {
+            'Authorization': f'HHRAA {token}',
+            'Cookie': 'TS01933b4f=0150a3e24e9202bf833ca0b28b146191c5e317ae476205812a320357332b9bfa8748963e7125bf8fed53d2e702edeaf3db7f74233e'
+        }
 
+        response = requests.get(url, headers=headers)
 
+        if response.status_code == 200:
+            data = response.json()
 
+            # استخراج اطلاعات موردنظر
+            verifications = data.get("verifications", [])
 
+            for item in verifications:
+                if item["step_display"] in ["Personal", "BankAccount", "Contact"]:
+                    print(f"عنوان: {item['step_display']}")
+                    print(f"وضعیت: {item['state_display']}")
+                    print(f"آخرین بروزرسانی: {item['updated']}")
+                    print(f"پایه‌ای بودن: {'بله' if item['is_base'] else 'خیر'}")
+                    print("-" * 40)
+        else:
+            print("خطا در دریافت اطلاعات:", response.status_code)
+
+        time.sleep(10)  # توقف 10 ثانیه‌ای بین اجراها
 
 
 if __name__ == '__main__':
+
+    phone_or_email = "09396985633" # شماره تلفن وحید زاهدی
     # phone_or_email = generate_unique_phone_number()
-    # register_user(phone_or_email)
-    # token = register_user_get_otp(phone_or_email)
+    register_user(phone_or_email)
+    token = register_user_get_otp(phone_or_email)
+    national_code = "2460222882"  # شماره کارت ملی وحید زاهدی
     # national_code = generate_national_Code_id()
+    card_number = "6219861906635536" # شماره کارت بانکی وحید زاهدی
     # card_number = generate_bank_card()
     birth_date = "1375-03-23"
     # verify_credentials(national_code, birth_date, card_number, token)
-    get_trader_info()
+    get_trader_info(token)
