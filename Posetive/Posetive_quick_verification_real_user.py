@@ -2,7 +2,7 @@ import time
 
 import requests
 import json
-import random
+
 
 # generated_numbers = set()
 # def generate_unique_phone_number():
@@ -68,23 +68,72 @@ def register_user(phone_number_or_email: str):
 
 
 
+
+def send_otp_request(phone_number_or_email, request_type):
+    url = f"https://api-staging.tabdealbot.com/utils/staging/otp/?cell_phone={phone_number_or_email}&type={request_type}"
+
+    payload = json.dumps({
+        "phone_or_email": phone_number_or_email
+    })
+
+    headers = {
+        'cell_phone': phone_number_or_email,
+        'type': request_type,
+        'Content-Type': 'application/json',
+        'Cookie': 'TS01933b4f=0150a3e24ed60eb4bc2d06d9173794134de896feaf5fd49ea9095471827d28cd0d11f6ebbe20903a709ab0c2b96c19ed687039b868'
+    }
+
+    response = requests.get(url, headers=headers, data=payload)
+
+    try:
+        response_data = response.json()
+        otp = response_data.get("otp", "")  # استخراج مقدار OTP
+        if otp:
+            print(otp)
+        return response_data
+    except json.JSONDecodeError:
+        return {"error": "Invalid JSON response"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def register_user_get_otp(phone_number_or_email):
-    get_input_from_user = input('Enter OTP: ')
+
+    result = send_otp_request(phone_number_or_email, "Registration")
+    otp = result.get("otp", "")
+
+    if not otp:
+        print("Error: OTP not received")
+        return None
 
     url = "https://api-staging.tabdealbot.com/register/"
     payload = json.dumps({
-        "phone": phone_number_or_email, # شماره تلفن وحید زاهدی
-        "token": get_input_from_user,
+        "phone": phone_number_or_email,  # شماره تلفن
+        "token": otp,
         "password": 'A@123456789'
     })
     headers = {'Content-Type': 'application/json'}
     response = requests.put(url, headers=headers, data=payload)
-    print(get_input_from_user)
 
     if response.status_code == 200:
         response_json = response.json()
         return response_json.get('token')
     else:
+
         print("Error:", response.text)
         return None
 
@@ -104,6 +153,11 @@ def verify_credentials(national_code, birth_date, card_number, token):
     print("\n")
     print("Verification Status Code:", response.status_code)
     print(response.text)
+
+
+
+
+
 
 
 def get_trader_info(token):
@@ -142,19 +196,24 @@ def get_trader_info(token):
         else:
             print("خطا در دریافت اطلاعات:", response.status_code)
 
-        time.sleep(10)  # توقف 10 ثانیه‌ای بین اجراها
+        time.sleep(30)  # توقف 10 ثانیه‌ای بین اجراها
 
 
 if __name__ == '__main__':
 
-    phone_or_email = "09396985633" # شماره تلفن وحید زاهدی
+    phone_or_email = "09105554444" # شماره تلفن وحید زاهدی
+
     # phone_or_email = generate_unique_phone_number()
     register_user(phone_or_email)
+
+
+
     token = register_user_get_otp(phone_or_email)
-    national_code = "2460222882"  # شماره کارت ملی وحید زاهدی
-    # national_code = generate_national_Code_id()
-    card_number = "6219861906635536" # شماره کارت بانکی وحید زاهدی
-    # card_number = generate_bank_card()
+
+    national_code = "0560103689"
+    card_number = "6219861083193887"
     birth_date = "1375-03-23"
-    # verify_credentials(national_code, birth_date, card_number, token)
+
+
+    verify_credentials(national_code, birth_date, card_number, token)
     get_trader_info(token)
